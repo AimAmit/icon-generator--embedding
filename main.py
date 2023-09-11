@@ -59,7 +59,7 @@ def query():
     return thumbnail_ids
 
 @app.route('/remove')
-def query():
+def remove():
     image_id = request.args.get("image_id")
     if not image_id:
         return []
