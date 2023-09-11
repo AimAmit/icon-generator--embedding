@@ -39,7 +39,33 @@ def hello_world():
         ]
     )
 
-    return jsonify({"respone": resp})
+    return jsonify({"respone": 'success'})
+
+@app.route('/query')
+def query():
+    search = request.args.get("search")
+    if not search:
+        return []
+    embedding = model.encode(search)
+
+    query_response = index.query(
+    top_k=50,
+    # include_values=True,
+    include_metadata=True,
+    vector=embedding.tolist(),
+    )
+    res = query_response.to_dict()
+    thumbnail_ids = list(map(lambda x: x['id'], res['matches']))
+    return thumbnail_ids
+
+@app.route('/remove')
+def query():
+    image_id = request.args.get("image_id")
+    if not image_id:
+        return []
+    index.delete(ids=[image_id])
+    return jsonify({"respone": 'success'})
+
 
 
 if __name__ == "__main__":
