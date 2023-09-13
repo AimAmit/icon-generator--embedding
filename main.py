@@ -25,16 +25,17 @@ def hello():
 def hello_world():
     prompt = request.args.get("prompt")
     image_id = request.args.get("image_id")
+    slug = request.args.get("slug")
 
     print(prompt, image_id)
 
     embedding = model.encode(prompt)
-    resp = index.upsert(
+    index.upsert(
         vectors=[
             {
                 "id": image_id,
                 "values": embedding,
-                "metadata": {"model": "Icon", "id_type": "thumbnail"},
+                "metadata": {"slug": slug},
             }
         ]
     )
@@ -55,7 +56,7 @@ def query():
     vector=embedding.tolist(),
     )
     res = query_response.to_dict()
-    thumbnail_ids = list(map(lambda x: x['id'], res['matches']))
+    thumbnail_ids = list(map(lambda x: {'thumbnail_id': x['id'], 'slug': x['metadata'].get('slug')}, res['matches']))
     return thumbnail_ids
 
 @app.route('/remove')
